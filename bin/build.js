@@ -17,6 +17,7 @@ const ENTRY_POINTS = [
   'src/features/modal/index.ts',
   'src/features/resources/index.ts',
   'src/features/video/index.ts',
+  'src/features/trustCenter/index.ts',
 ];
 
 // Config dev serving

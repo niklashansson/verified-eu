@@ -2,7 +2,6 @@ import { Swiper } from 'swiper';
 import { Controller, Navigation, Pagination } from 'swiper/modules';
 import type { SwiperOptions } from 'swiper/types/swiper-options';
 
-import { loadElement } from '$utils/loadElement';
 import { queryElement } from '$utils/queryElement';
 import { queryElements } from '$utils/queryElements';
 
@@ -10,23 +9,29 @@ window.Webflow = window.Webflow || [];
 
 window.Webflow.push(async () => {
   const attribute = '[swiper="quotes1"]';
-  const requiredElements = ['swiper', 'quotes1_pagination_list'];
-
-  loadQuotesElements();
+  const requiredElements = ['swiper', 'quotes1_pagination_list', 'quotes1_pagination_bullet'];
 
   // swiper instances
   queryElements(attribute).map((instance) => {
-    const [swiperEl, paginationList] = requiredElements.map((el) =>
+    const [swiperEl, paginationList, paginationBullet] = requiredElements.map((el) =>
       queryElement(`.${el}`, instance)
     );
-    if (!swiperEl || !paginationList) return;
+    if (!swiperEl || !paginationList || !paginationBullet) return;
 
-    const paginationItems = Array.from(paginationList.children).map((el) => {
-      const bulletEl = el.firstElementChild;
-      if (!bulletEl) return;
+    const paginationBullets = Array.from(queryElements('[data-bullet-img]', swiperEl)).map(
+      (bullet) => {
+        if (!bullet) return;
 
-      return el.firstElementChild.outerHTML;
-    });
+        const src = bullet.dataset.bulletImg || '';
+        const bulletEl = paginationBullet.cloneNode(true) as HTMLElement;
+
+        const bulletElImg = bulletEl.firstChild as HTMLImageElement;
+        bulletElImg.src = src;
+
+        const markup = bulletElImg.outerHTML;
+        return markup;
+      }
+    );
 
     // options passed to swiper initatior
     const options: SwiperOptions = {
@@ -40,7 +45,7 @@ window.Webflow.push(async () => {
         bulletClass: 'quotes1_pagination_bullet',
         bulletActiveClass: 'is-active',
         renderBullet: function (index: number, className: string) {
-          return `<div class="${className}">${paginationItems[index]}</div>`;
+          return `<div class="${className}">${paginationBullets[index]}</div>`;
         },
       },
       navigation: {
@@ -52,25 +57,3 @@ window.Webflow.push(async () => {
     new Swiper(swiperEl, options);
   });
 });
-
-async function loadQuotesElements() {
-  const instances: HTMLElement[] = queryElements('[nested-collection-element="quotes-1-target"]');
-  if (!instances.length) {
-    return;
-  }
-
-  instances.forEach((instance) => {
-    const nestTarget = instance;
-
-    const attributeValues = [
-      'nested-collection-item-slug',
-      'nested-collection-slug',
-      'nested-collection-class',
-    ].map((attribute) => nestTarget.getAttribute(attribute));
-
-    const [collectionItemSlug, collectionSlug, className] = attributeValues;
-    if (!collectionItemSlug || !collectionSlug || !className) return;
-
-    loadElement(nestTarget, collectionSlug, collectionItemSlug, className);
-  });
-}

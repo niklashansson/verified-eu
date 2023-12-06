@@ -1,3 +1,4 @@
+import { closeDropdown } from '@finsweet/ts-utils';
 import { gsap } from 'gsap';
 
 import { queryElement } from '$utils/queryElement';
@@ -9,6 +10,17 @@ window.Webflow.push(() => {
   //  webflow elements
   const elements = ['', '-menu', '-button', '-brand'].map((elClass) => {
     return queryElement(`.w-nav${elClass}`);
+  });
+
+  const closeDropdownBtns = queryElements('.navbar_dropdown_close');
+
+  closeDropdownBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const dropdown = btn.closest('.w-dropdown') as HTMLDivElement | null;
+      if (!dropdown) return;
+      e.preventDefault();
+      closeDropdown(dropdown);
+    });
   });
 
   const [nav, menu, btn, brand] = elements;
@@ -97,9 +109,4 @@ window.Webflow.push(() => {
     const tl = gsap.timeline();
     tl.to(nav, { backgroundColor: 'transparent', duration: 0.1 });
   }
-
-  // function animateDropdown(dropdownEl: HTMLElement) {
-  //   const tl = gsap.timeline();
-  //   tl.fromTo(dropdownEl, { transform: 'translateY(--100%)' }, { transform: 'translateY(0%)' });
-  // }
 });
