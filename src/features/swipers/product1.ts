@@ -56,6 +56,15 @@ window.Webflow.push(() => {
           slidesPerView: 1.125,
           spaceBetween: 24,
         },
+        320: {
+          allowTouchMove: true,
+          pagination: {
+            enabled: false,
+          },
+          speed: 800,
+          slidesPerView: 1.125,
+          spaceBetween: 24,
+        },
       },
     };
 
